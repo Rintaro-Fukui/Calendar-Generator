@@ -98,3 +98,5 @@ def generateCalendar(jikanwari:list):
                     cal.events.add(event)
 
             start += datetime.timedelta(days=1)
+
+    return str(cal)
