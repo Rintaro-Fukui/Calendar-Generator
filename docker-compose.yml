@@ -8,7 +8,7 @@ services:
       - 5900:5900
     shm_size: "2gb"
   sample-streamlit:
-    container_name: api
+    container_name: app
     build:
       context: .
       dockerfile: ./app/Dockerfile
