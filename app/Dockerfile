@@ -13,4 +13,4 @@ COPY requirements.txt .
 
 RUN python3.8 -m pip install -r requirements.txt
 
-COPY ./api/ /app
+COPY ./app/ /app
