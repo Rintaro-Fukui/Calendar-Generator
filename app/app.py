@@ -6,10 +6,14 @@ from generate_calendar import generateCalendar
 
 def main():
 
+    st.title('Calendar Generator')
+
+    st.text('MUSCATのmy時間割から自動でカレンダーを作成します。')
+
     with st.form("my_form", clear_on_submit=False):
 
         stu_id = st.number_input('学籍番号(先頭にsは不要です)',2000000, 3000000, 2000000, step=1)
-        password = st.text_input('パスワード', type="password")
+        password = st.text_input('MUSCATのパスワード', type="password")
         submitted = st.form_submit_button("カレンダーを作成")
 
     # ボタンを押した時の処理
