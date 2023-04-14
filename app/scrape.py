@@ -1,13 +1,31 @@
+import os
 import re
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 from bs4 import BeautifulSoup
 
-def scrape(stu_id:int, password:str):
+from selenium import webdriver
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome import service as fs
+from selenium.webdriver import ChromeOptions
+from webdriver_manager.core.utils import ChromeType
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+
+def scrape(stu_id:str, password:str):
 
     options = webdriver.ChromeOptions()
-    driver = webdriver.Chrome("chromedriver",options=options)
+
+    options.add_argument("--headless")
+    options.add_argument('--disable-gpu')
+    options.add_argument('--no-sandbox')
+    options.add_argument('--disable-dev-shm-usage')
+
+    CHROMEDRIVER = ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()
+    service = fs.Service(CHROMEDRIVER)
+
+    driver = webdriver.Chrome(
+        options=options,
+        service=service
+        )
 
     # urlを指定
     url="https://muscat.musashino-u.ac.jp/portal/top.do"
@@ -60,5 +78,7 @@ def scrape(stu_id:int, password:str):
             table = re.findall(r"<!-- コマに対応する時間割情報が存在しない場合、縦幅を確保する -->|<a.*?>(.*?)</a>", table)
             jikanwari_ = [table[0:6], table[6:12], table[12:18], table[18:24], table[24:30], table[30:36], table[36:42]]
             jikanwari.append(jikanwari_)
+
+    driver.close()
 
     return jikanwari
