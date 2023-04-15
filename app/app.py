@@ -12,7 +12,7 @@ def main():
 
     with st.form("my_form", clear_on_submit=False):
 
-        stu_id = st.number_input('学籍番号(先頭にsは不要です)',2000000, 3000000, 2000000, step=1)
+        stu_id = st.number_input('学籍番号(先頭にsは不要です)',1500000, 3000000, 2000000, step=1)
         password = st.text_input('MUSCATのパスワード', type="password")
         submitted = st.form_submit_button("カレンダーを作成")
 
