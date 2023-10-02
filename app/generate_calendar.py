@@ -1,13 +1,12 @@
-import time
 import datetime
 import arrow
 from ics import Calendar, Event
 
-def generateCalendar(jikanwari:list):
+def generateCalendar(jikanwari:list) -> str:
 
     # カレンダーの作成
     cal = Calendar()
-    cal.creator = 'Rintaro Fukui'
+    cal.creator = 'MU-Calendar-Generator'
 
     # 学期
     semester = {
@@ -19,32 +18,15 @@ def generateCalendar(jikanwari:list):
 
     # 休日
     holiday = [
-        datetime.date(2023,4,29),
-        datetime.date(2023,5,1),
-        datetime.date(2023,5,2),
-        datetime.date(2023,5,3),
-        datetime.date(2023,5,4),
-        datetime.date(2023,5,5),
-        datetime.date(2023,5,20),
-        datetime.date(2023,10,6),
-        datetime.date(2023,10,9),
-        datetime.date(2023,12,26),
-        datetime.date(2023,12,27),
-        datetime.date(2023,12,28),
-        datetime.date(2023,12,29),
-        datetime.date(2023,12,30),
-        datetime.date(2024,1,1),
-        datetime.date(2024,1,2),
-        datetime.date(2024,1,3),
-        datetime.date(2024,1,4),
-        datetime.date(2024,1,5),
-        datetime.date(2024,1,6),
-        datetime.date(2024,1,8),
-        datetime.date(2024,1,9),
-        datetime.date(2024,1,12),
-        datetime.date(2024,1,13),
-        datetime.date(2024,1,24),
-        datetime.date(2024,1,25),
+        datetime.date(2023,4,29), datetime.date(2023,5,1), datetime.date(2023,5,2),
+        datetime.date(2023,5,3), datetime.date(2023,5,4), datetime.date(2023,5,5),
+        datetime.date(2023,5,20), datetime.date(2023,10,6), datetime.date(2023,10,9),
+        datetime.date(2023,12,26), datetime.date(2023,12,27), datetime.date(2023,12,28),
+        datetime.date(2023,12,29), datetime.date(2023,12,30), datetime.date(2024,1,1),
+        datetime.date(2024,1,2), datetime.date(2024,1,3), datetime.date(2024,1,4),
+        datetime.date(2024,1,5), datetime.date(2024,1,6), datetime.date(2024,1,8),
+        datetime.date(2024,1,9), datetime.date(2024,1,12), datetime.date(2024,1,13),
+        datetime.date(2024,1,24), datetime.date(2024,1,25),
     ]
 
     # 時間
@@ -58,45 +40,51 @@ def generateCalendar(jikanwari:list):
         6: ['20:20:00', '22:00:00'],
         }
 
-    # 時間割に合わせてイベントを作成
-    for i in range(4):
+    # 学期を判定
+    now_semester = None
+    today = datetime.date.today()
+    if (semester[0][0] <= today) & (today <= semester[0][1]):
+        now_semester = 0
+    elif (semester[1][0] <= today) & (today <= semester[1][1]):
+        now_semester = 1
+    elif (semester[2][0] <= today) & (today <= semester[2][1]):
+        now_semester = 2
+    elif (semester[3][0] <= today) & (today <= semester[3][1]):
+        now_semester = 3
 
-        # 学期の開始日
-        start = semester[i][0]
+    # 学期の開始日
+    start = semester[now_semester][0]
 
-        # 学期の終了日
-        stop = semester[i][1]
+    # 学期の終了日
+    stop = semester[now_semester][1]
 
-        # 学期の時間割
-        jikanwari_ = jikanwari[i]
+    while start <= stop:
 
-        while start <= stop:
+        # 曜日を取得
+        weekday = start.weekday()
 
-            # 曜日を取得
-            weekday = start.weekday()
+        for i in range(len(jikanwari)):
 
-            for i in range(len(jikanwari_)):
+            rele = jikanwari[i]
 
-                rele = jikanwari_[i]
+            # 日曜日ではない/授業がある/休日ではない を全て満たす場合にイベントを作成
+            if weekday != 6 and rele[weekday] != '' and start not in holiday:
 
-                # 日曜日ではない/授業がある/休日ではない を全て満たす場合にイベントを作成
-                if weekday != 6 and rele[weekday] != '' and start not in holiday:
+                # イベントを作成
+                event = Event()
 
-                    # イベントを作成
-                    event = Event()
+                # イベント名
+                event.name = jikanwari[i][weekday]
 
-                    # イベント名
-                    event.name = jikanwari_[i][weekday]
+                # 開始時刻
+                event.begin = arrow.get(f"{start} {class_time[i][0]}", "YYYY-MM-DD HH:mm:ss").replace(tzinfo="Asia/Tokyo")
 
-                    # 開始時刻
-                    event.begin = arrow.get(f"{start} {class_time[i][0]}", "YYYY-MM-DD HH:mm:ss").replace(tzinfo="Asia/Tokyo")
+                # 終了時刻
+                event.end = arrow.get(f"{start} {class_time[i][1]}" ,"YYYY-MM-DD HH:mm:ss").replace(tzinfo="Asia/Tokyo")
 
-                    # 終了時刻
-                    event.end = arrow.get(f"{start} {class_time[i][1]}" ,"YYYY-MM-DD HH:mm:ss").replace(tzinfo="Asia/Tokyo")
+                # イベントをカレンダーに追加
+                cal.events.add(event)
 
-                    # イベントをカレンダーに追加
-                    cal.events.add(event)
-
-            start += datetime.timedelta(days=1)
+        start += datetime.timedelta(days=1)
 
     return str(cal)
