@@ -1,30 +1,22 @@
-import os
 import re
-from bs4 import BeautifulSoup
-
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.chrome import service as fs
+from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver import ChromeOptions
-from webdriver_manager.core.utils import ChromeType
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
-def scrape(stu_id:str, password:str):
+def scrape(stu_id:str, password:str) -> list:
 
-    options = webdriver.ChromeOptions()
-
+    # chrome driverの設定
+    options = ChromeOptions()
     options.add_argument("--headless")
     options.add_argument('--disable-gpu')
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
-
-    CHROMEDRIVER = ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()
-    service = fs.Service(CHROMEDRIVER)
-
     driver = webdriver.Chrome(
         options=options,
-        service=service
+        service=ChromeService(ChromeDriverManager().install())
         )
 
     # urlを指定
@@ -43,42 +35,26 @@ def scrape(stu_id:str, password:str):
     btn.click()
 
     # メニューの非表示を解除
-    menuList = driver.find_element(By.XPATH,"/html/body/div[1]/div[1]/div[6]/ul/li[2]/ul")
+    menuList = driver.find_element(By.XPATH,"/html/body/div[1]/div[1]/div[6]/ul/li[3]/ul")
     driver.execute_script("arguments[0].setAttribute('style','display: block;')", menuList)
 
-    # my時間割にアクセス
-    myCalendar = driver.find_element(By.XPATH,"/html/body/div[1]/div[1]/div[6]/ul/li[2]/ul/li[1]/a")
+    # 履修登録確認にアクセス
+    myCalendar = driver.find_element(By.XPATH,"/html/body/div[1]/div[1]/div[6]/ul/li[3]/ul/li[1]/a")
     myCalendar.send_keys(Keys.ENTER)
 
-    jikanwari = []
+    # 時間割を抽出
+    table = []
+    for j in range(3, 16, 2):
+        for i in range(3, 14, 2):
+            coma_xpath = f"/html/body/div/div[2]/table/tbody/tr/td[1]/form/div[2]/div[3]/table/tbody/tr[{j}]/td[{i}]/table/tbody/tr/td"
+            coma = driver.find_element(By.XPATH, coma_xpath)
+            coma_text = coma.get_attribute("innerHTML")
+            pattern = r'<br>(.*?)<br>'
+            matches = re.findall(pattern, coma_text, re.DOTALL)
+            table.append(matches[0].strip())
+    jikanwari = [table[0:6], table[6:12], table[12:18], table[18:24], table[24:30], table[30:36], table[36:42]]
 
-    for i in range(1, 5):
-
-        if i != 1:
-
-            # 1学期でない場合は学期を切り替える
-            xpath = f"/html/body/div/div[2]/table/tbody/tr/td[1]/form/div[2]/div[2]/div/ul/li[{i}]/a"
-            Calendar = driver.find_element(By.XPATH, xpath)
-            Calendar.send_keys(Keys.ENTER)
-
-            # 時間割を抽出
-            html = driver.page_source
-            bs = BeautifulSoup(html, "html.parser")
-            table = str(bs.find_all("table", class_="detail jikanwari_table"))
-            table = re.findall(r"<!-- コマに対応する時間割情報が存在しない場合、縦幅を確保する -->|<a.*?>(.*?)</a>", table)
-            jikanwari_ = [table[0:6], table[6:12], table[12:18], table[18:24], table[24:30], table[30:36], table[36:42]]
-            jikanwari.append(jikanwari_)
-
-        else:
-
-            # 時間割を抽出
-            html = driver.page_source
-            bs = BeautifulSoup(html, "html.parser")
-            table = str(bs.find_all("table", class_="detail jikanwari_table"))
-            table = re.findall(r"<!-- コマに対応する時間割情報が存在しない場合、縦幅を確保する -->|<a.*?>(.*?)</a>", table)
-            jikanwari_ = [table[0:6], table[6:12], table[12:18], table[18:24], table[24:30], table[30:36], table[36:42]]
-            jikanwari.append(jikanwari_)
-
+    # chromeを終了
     driver.close()
 
     return jikanwari

@@ -1,5 +1,4 @@
 import streamlit as st
-
 from scrape import scrape
 from generate_calendar import generateCalendar
 
@@ -7,7 +6,6 @@ from generate_calendar import generateCalendar
 def main():
 
     st.title('Calendar Generator')
-
     st.text('MUSCATのmy時間割から自動でカレンダーを作成します。')
 
     with st.form("my_form", clear_on_submit=False):
