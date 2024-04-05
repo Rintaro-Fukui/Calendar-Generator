@@ -1,6 +1,8 @@
 # Calendar-Generator
 
-[武蔵野大学のポータルサイト](https://muscat.musashino-u.ac.jp/portal/top.do)から履修情報を取得し、自動でカレンダーを作成するスクリプトです
+[武蔵野大学のポータルサイト](https://muscat.musashino-u.ac.jp/portal/top.do)から履修情報を取得し、自動でカレンダーを作成するスクリプトです。下のURLからも利用可能です。
+
+[https://rintaro-fukui-calendar-generator-appapp-dty2mz.streamlit.app/](https://rintaro-fukui-calendar-generator-appapp-dty2mz.streamlit.app/)
 
 ## Getting Started
 
