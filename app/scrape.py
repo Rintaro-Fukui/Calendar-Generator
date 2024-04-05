@@ -1,6 +1,7 @@
 import re
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.core.os_manager import ChromeType
 from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver import ChromeOptions
 from selenium.webdriver.common.by import By
@@ -14,9 +15,12 @@ def scrape(stu_id:str, password:str) -> list:
     options.add_argument('--disable-gpu')
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
+    service = ChromeService(
+        ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()
+    )
     driver = webdriver.Chrome(
         options=options,
-        service=ChromeService(ChromeDriverManager().install())
+        service=service
     )
 
     # urlを指定
