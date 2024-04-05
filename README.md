@@ -1,5 +1,14 @@
 # Calendar-Generator
-大学のポータルサイトから時間割を取得して.icsを作成する
 
-`Calendar_Generator.ipynb`もしくは、下のurlから利用できます。<br>
-https://rintaro-fukui-calendar-generator-appapp-284wkz.streamlit.app/
+[武蔵野大学のポータルサイト](https://muscat.musashino-u.ac.jp/portal/top.do)から履修情報を取得し、自動でカレンダーを作成するスクリプトです
+
+## Getting Started
+
+```shell
+git clone https://github.com/Rintaro-Fukui/Calendar-Generator.git
+cd ./Calendar-Generator/app
+python3 -m venv venv
+source ./venv/bin/activate
+pip install -r requirements.txt
+streamlit run app.py
+```
