@@ -10,23 +10,28 @@ def generateCalendar(jikanwari:list) -> str:
 
     # 学期
     semester = {
-        0: [datetime.date(2023,4,15), datetime.date(2023,6,10)],
-        1: [datetime.date(2023,6,15), datetime.date(2023,8,2)],
-        2: [datetime.date(2023,9,22), datetime.date(2023,11,13)],
-        3: [datetime.date(2023,11,21), datetime.date(2024,1,27)],
+        0: [datetime.date(2024,4,15), datetime.date(2024,6,8)],
+        1: [datetime.date(2024,6,13), datetime.date(2024,7,31)],
+        2: [datetime.date(2024,9,20), datetime.date(2024,11,11)],
+        3: [datetime.date(2024,11,19), datetime.date(2025,1,25)],
     }
 
     # 休日
     holiday = [
-        datetime.date(2023,4,29), datetime.date(2023,5,1), datetime.date(2023,5,2),
-        datetime.date(2023,5,3), datetime.date(2023,5,4), datetime.date(2023,5,5),
-        datetime.date(2023,5,20), datetime.date(2023,10,6), datetime.date(2023,10,9),
-        datetime.date(2023,12,26), datetime.date(2023,12,27), datetime.date(2023,12,28),
-        datetime.date(2023,12,29), datetime.date(2023,12,30), datetime.date(2024,1,1),
-        datetime.date(2024,1,2), datetime.date(2024,1,3), datetime.date(2024,1,4),
-        datetime.date(2024,1,5), datetime.date(2024,1,6), datetime.date(2024,1,8),
-        datetime.date(2024,1,9), datetime.date(2024,1,12), datetime.date(2024,1,13),
-        datetime.date(2024,1,24), datetime.date(2024,1,25),
+        datetime.date(2024,5,1), datetime.date(2024,5,2),
+        datetime.date(2024,5,3), datetime.date(2024,5,4),
+        datetime.date(2024,5,6), datetime.date(2024,5,21),
+        datetime.date(2024,10,11), datetime.date(2024,10,12),
+        datetime.date(2024,10,14), datetime.date(2024,11,15),
+        datetime.date(2024,11,16), datetime.date(2024,11,18),
+        datetime.date(2024,12,11), datetime.date(2024,12,24),
+        datetime.date(2024,12,25), datetime.date(2024,12,26),
+        datetime.date(2024,12,27), datetime.date(2024,12,28),
+        datetime.date(2024,12,30), datetime.date(2024,12,31),
+        datetime.date(2025,1,1), datetime.date(2025,1,2),
+        datetime.date(2025,1,3), datetime.date(2025,1,4),
+        datetime.date(2025,1,13), datetime.date(2025,1,14),
+        datetime.date(2025,1,17), datetime.date(2025,1,18),
     ]
 
     # 時間
@@ -38,53 +43,53 @@ def generateCalendar(jikanwari:list) -> str:
         4: ['16:50:00', '18:30:00'],
         5: ['18:40:00', '20:20:00'],
         6: ['20:20:00', '22:00:00'],
-        }
+    }
 
-    # 学期を判定
-    now_semester = None
-    today = datetime.date.today()
-    if (semester[0][0] <= today) & (today <= semester[0][1]):
-        now_semester = 0
-    elif (semester[1][0] <= today) & (today <= semester[1][1]):
-        now_semester = 1
-    elif (semester[2][0] <= today) & (today <= semester[2][1]):
-        now_semester = 2
-    elif (semester[3][0] <= today) & (today <= semester[3][1]):
-        now_semester = 3
+    # 時間割に合わせてイベントを作成
+    for i in range(4):
 
-    # 学期の開始日
-    start = semester[now_semester][0]
+        # 学期の開始日
+        start = semester[i][0]
 
-    # 学期の終了日
-    stop = semester[now_semester][1]
+        # 学期の終了日
+        stop = semester[i][1]
 
-    while start <= stop:
+        # 学期の時間割
+        jikanwari_ = jikanwari[i]
 
-        # 曜日を取得
-        weekday = start.weekday()
+        while start <= stop:
 
-        for i in range(len(jikanwari)):
+            # 曜日を取得
+            weekday = start.weekday()
 
-            rele = jikanwari[i]
+            for i in range(len(jikanwari_)):
 
-            # 日曜日ではない/授業がある/休日ではない を全て満たす場合にイベントを作成
-            if weekday != 6 and rele[weekday] != '' and start not in holiday:
+                rele = jikanwari_[i]
 
-                # イベントを作成
-                event = Event()
+                # 日曜日ではない/授業がある/休日ではない を全て満たす場合にイベントを作成
+                if weekday != 6 and rele[weekday] != '' and start not in holiday:
 
-                # イベント名
-                event.name = jikanwari[i][weekday]
+                    # イベントを作成
+                    event = Event()
 
-                # 開始時刻
-                event.begin = arrow.get(f"{start} {class_time[i][0]}", "YYYY-MM-DD HH:mm:ss").replace(tzinfo="Asia/Tokyo")
+                    # イベント名
+                    event.name = jikanwari_[i][weekday]
 
-                # 終了時刻
-                event.end = arrow.get(f"{start} {class_time[i][1]}" ,"YYYY-MM-DD HH:mm:ss").replace(tzinfo="Asia/Tokyo")
+                    # 開始時刻
+                    event.begin = arrow.get(
+                        f"{start} {class_time[i][0]}",
+                        "YYYY-MM-DD HH:mm:ss"
+                    ).replace(tzinfo="Asia/Tokyo")
 
-                # イベントをカレンダーに追加
-                cal.events.add(event)
+                    # 終了時刻
+                    event.end = arrow.get(
+                        f"{start} {class_time[i][1]}",
+                        "YYYY-MM-DD HH:mm:ss"
+                    ).replace(tzinfo="Asia/Tokyo")
 
-        start += datetime.timedelta(days=1)
+                    # イベントをカレンダーに追加
+                    cal.events.add(event)
+
+            start += datetime.timedelta(days=1)
 
     return str(cal)
